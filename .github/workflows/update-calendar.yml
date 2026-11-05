@@ -27,23 +27,21 @@ jobs:
         with: { python-version: '3.12' }
 
       - name: 安装依赖
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas openpyxl
+        run: pip install openpyxl
 
       - name: 生成订阅源
-        run: |
-          mkdir -p publish
-          python 助学贷款还款计划表.py publish
+        run: python 助学贷款还款计划表.py publish
 
-      - name: 强制提交并推送
+      - name: 确认文件
+        run: ls -la publish/
+
+      - name: 提交并推送
         run: |
           git config user.name  "loan-calendar[bot]"
           git config user.email "loan-calendar@users.noreply.github.com"
           git add publish/loan.ics
           git commit -m "chore: 刷新还款日历 $(TZ=Asia/Shanghai date +%F)" || true
           git push || true
-          echo "✅ 已处理 loan.ics"
 
       - name: 上传到 GitHub Pages
         uses: actions/upload-pages-artifact@v3
@@ -66,8 +64,6 @@ jobs:
 
       - name: 打印订阅地址
         run: |
-          echo "============================================================"
           echo "订阅地址："
           echo "  https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/loan.ics"
           echo "  webcal://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/loan.ics"
-          echo "============================================================"
